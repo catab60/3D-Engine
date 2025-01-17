@@ -4,16 +4,45 @@ import numpy as np
 import math
 
 
+
+
 points = []
-scale = 10
-points.append(np.matrix([-1, -1, 1]))
-points.append(np.matrix([1, -1, 1]))
-points.append(np.matrix([1,  1, 1]))
-points.append(np.matrix([-1, 1, 1]))
-points.append(np.matrix([-1, -1, -1]))
-points.append(np.matrix([1, -1, -1]))
-points.append(np.matrix([1, 1, -1]))
-points.append(np.matrix([-1, 1, -1]))
+scale = 25
+
+
+
+def get_vertices(file_path):
+    vertices = []
+    # Open the file and read its content
+    with open(file_path, 'r') as file:
+        for line in file:
+            if line.startswith('v '):
+                vertex = line.split()[1:]
+                vertices.append([float(coord) for coord in vertex])
+    return vertices
+
+def get_faces(file_path):
+    faces = []
+    
+    with open(file_path, 'r') as file:
+        for line in file:
+            if line.startswith('f '):
+                face = line.split()[1:]
+                faces.append([int(vertex_idx.split('/')[0]) - 1 for vertex_idx in face])  
+    return faces
+
+
+# Load Model:
+
+ModelPath = "sphere.obj"
+
+for vertices in get_vertices(ModelPath):
+    points.append(np.matrix(vertices))
+
+Faces = get_faces(ModelPath)
+
+
+
 
 projection_matrix = np.matrix([
     [1, 0, 0],
@@ -23,9 +52,9 @@ projection_matrix = np.matrix([
 
 
 class Screen():
-    def __init__(self):
-        self.width = 150
-        self.height = 50
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
         self.placeholder = "#"
         self.emptyholder = " "
         self.lineholder = "#"
@@ -73,21 +102,16 @@ class Screen():
                     self.projected_points.append([y, x])
 
                     
+                for face in Faces:  # Iterates through each face
+                    num_vertices = len(face)
+                    for i in range(num_vertices):
+                        start_idx = face[i]  # Current vertex index
+                        end_idx = face[(i + 1) % num_vertices]  # Next vertex (wraps around to the first one)
 
-                self.connect_line(self.projected_points[0], self.projected_points[1])
-                self.connect_line(self.projected_points[1], self.projected_points[2])
-                self.connect_line(self.projected_points[2], self.projected_points[3])
-                self.connect_line(self.projected_points[3], self.projected_points[0])
+                        # Connect the vertices (adjusted to use the correct indices)
+                        self.connect_line(self.projected_points[start_idx], self.projected_points[end_idx])
 
-                self.connect_line(self.projected_points[4], self.projected_points[5])
-                self.connect_line(self.projected_points[5], self.projected_points[6])
-                self.connect_line(self.projected_points[6], self.projected_points[7])
-                self.connect_line(self.projected_points[7], self.projected_points[4])
 
-                self.connect_line(self.projected_points[0], self.projected_points[4])
-                self.connect_line(self.projected_points[1], self.projected_points[5])
-                self.connect_line(self.projected_points[2], self.projected_points[6])
-                self.connect_line(self.projected_points[3], self.projected_points[7])
                 
                 for row in range(len(self.screen)):
                     for col in range(len(self.screen[row])):
@@ -136,7 +160,7 @@ class Screen():
 
 
 
-p = Screen()
+p = Screen(width=200, height=70)
 
 p.render()
 input()
