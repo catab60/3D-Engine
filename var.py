@@ -70,9 +70,9 @@ class Screen():
     def __init__(self, width:int, height:int, font_size:int, show_fps:bool, obj_scale:int, obj:load_model):
         self.width = width
         self.height = height
-        self.placeholder = "#"
+        self.verticeholder = "#"
         self.emptyholder = " "
-        self.lineholder = "#"
+        self.lineholder = "."
         self.screen = []
         self.fontSize = font_size
         self.angle = 0 
@@ -146,7 +146,7 @@ class Screen():
                     [0, math.cos(self.angle), -math.sin(self.angle)],
                     [0, math.sin(self.angle), math.cos(self.angle)],
                 ])
-                self.angle += 0.1
+                self.angle += 0.02
 
                 for point in self.points:
                     rotated2d = np.dot(rotation_z, point.reshape((3, 1)))
@@ -161,7 +161,7 @@ class Screen():
                     
                     try:
                         if y>=0 and x>=0:
-                            self.screen[y][x] = self.placeholder
+                            self.screen[y][x] = self.verticeholder
 
                     except:
                         pass
@@ -216,8 +216,11 @@ class Screen():
 
         x, y = self.x1, self.y1
 
+        
+
         while True:
             self.plot(x, y)
+
             
             if x == self.x2 and y == self.y2:
                 break
@@ -231,10 +234,22 @@ class Screen():
             if e2 < self.dx:
                 self.error += self.dx
                 y += self.sy
+
+        if self.x1>=0 and self.x1<self.height and self.y1>=0 and self.y1<self.width:
+            self.screen[self.x1][self.y1] = self.verticeholder
+        if self.x2>=0 and self.x2<self.height and self.y2>=0 and self.y2<self.width:
+            self.screen[self.x2][self.y2] = self.verticeholder
+
+
+
+        
+        
+
     def plot(self, x, y):
 
         try:
             if y>=0 and x>=0:
+
                 self.screen[x][y] = self.lineholder
         except:
             pass
