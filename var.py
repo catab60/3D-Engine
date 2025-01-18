@@ -152,25 +152,32 @@ class Screen():
                     x = int(projected2d[0][0] * self.scale) + self.width//2
                     y = int(projected2d[1][0] * self.scale) + self.height//2
 
-                    self.screen[y][x] = self.placeholder
+                    
+                    try:
+                        if y>=0 and x>=0:
+                            self.screen[y][x] = self.placeholder
+
+                    except:
+                        pass
                     self.projected_points.append([y, x])
 
                     
-                for face in self.faces:  # Iterates through each face
+                for face in self.faces:
                     num_vertices = len(face)
                     for i in range(num_vertices):
-                        start_idx = face[i]  # Current vertex index
-                        end_idx = face[(i + 1) % num_vertices]  # Next vertex (wraps around to the first one)
+                        start_idx = face[i]
+                        end_idx = face[(i + 1) % num_vertices]
 
-                        # Connect the vertices (adjusted to use the correct indices)
+
                         self.connect_line(self.projected_points[start_idx], self.projected_points[end_idx])
-
 
                 
                 for row in range(len(self.screen)):
                     for col in range(len(self.screen[row])):
                         print(self.screen[row][col], end="")
                     print()
+                
+
                 
         threading.Thread(target=sub_proccess).start()
 
@@ -210,4 +217,14 @@ class Screen():
                 self.error += self.dx
                 y += self.sy
     def plot(self, x, y):
-        self.screen[x][y] = self.lineholder
+
+        try:
+            if y>=0 and x>=0:
+                self.screen[x][y] = self.lineholder
+        except:
+            pass
+        
+
+
+        pass
+
