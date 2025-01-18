@@ -1,4 +1,4 @@
-
+import time
 import os
 import threading
 import numpy as np
@@ -6,6 +6,7 @@ import math
 import sys
 import ctypes as cts
 import ctypes.wintypes as wts
+
 
 
 
@@ -66,7 +67,7 @@ class CONSOLE_FONT_INFOEX(cts.Structure):
     )
 
 class Screen():
-    def __init__(self, width, height, font_size, obj_scale, obj):
+    def __init__(self, width:int, height:int, font_size:int, show_fps:bool, obj_scale:int, obj:load_model):
         self.width = width
         self.height = height
         self.placeholder = "#"
@@ -78,6 +79,9 @@ class Screen():
         self.scale = obj_scale
         self.points = obj[0]
         self.faces = obj[1]
+        self.frame_count = 0
+        self.start_time = time.time()
+        self.show_fps = show_fps
 
         self.projected_points = []
 
@@ -121,6 +125,8 @@ class Screen():
         def sub_proccess():
             while True:
                 self.clear()
+
+                
                 os.system(f"mode con cols={self.width+1} lines={self.height+1}")
 
                 rotation_z = np.matrix([
@@ -171,11 +177,20 @@ class Screen():
 
                         self.connect_line(self.projected_points[start_idx], self.projected_points[end_idx])
 
+
+                if self.show_fps:
+                    self.frame_count += 1
+                    self.elapsed_time = time.time() - self.start_time
+                    if self.elapsed_time > 0:
+                        fps = str(int(self.frame_count / self.elapsed_time))
+                        for i, digit in enumerate(fps):
+                            self.screen[0][-len(fps) + i] = digit
+
                 
-                for row in range(len(self.screen)):
-                    for col in range(len(self.screen[row])):
-                        print(self.screen[row][col], end="")
-                    print()
+                sys.stdout.write("\n".join("".join(row) for row in self.screen) + "\n")
+
+                
+                
                 
 
                 
